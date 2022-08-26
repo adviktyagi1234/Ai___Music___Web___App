@@ -5,15 +5,17 @@ LeftWristY = 0;
 RightWristX = 0;
 RightWristY = 0;
 ScoreLeftWrist = 0;
-PlayOrNot = "";
+PlayOrNot_Left = "";
+ScoreRightWrist = 0;
+PlayOrNot_Right = "";
 
 function preload() {
-    song1 = loadSound("Song2.mp3");
-    song2 = loadSound("Song.mp3");
+    song1 = loadSound("Song1.mp3");
+    song2 = loadSound("Song2.mp3");
 }
 
 function setup() {
-    canvas =    createCanvas(600, 500);
+    canvas = createCanvas(600, 500);
     canvas.center();
 
     video = createCapture(VIDEO);
@@ -23,15 +25,12 @@ function setup() {
     poseNet.on('pose', gotPoses);
 }
 
-function modelLoaded()
-{
+function modelLoaded() {
     console.log("DOne!(Posenet Is Initialized)");
 }
 
-function gotPoses(results)
-{
-    if(results[0] > 0)
-    {
+function gotPoses(results) {
+    if (results.length > 0) {
         RightWristX = results[0].pose.rightWrist.x;
         RightWristY = results[0].pose.rightWrist.y;
         console.log("rightWristX = " + RightWristX + " rightWristY = " + RightWristY);
@@ -40,28 +39,47 @@ function gotPoses(results)
         LeftWristY = results[0].pose.leftWrist.y;
         console.log("leftWristX = " + LeftWristX + " leftWristY = " + LeftWristY);
 
-        ScoreLeftWrist = resluts[0].pose.keypoints[9].score;
+        scoreRightWrist = results[0].pose.keypoints[10].score;
+        ScoreLeftWrist = results[0].pose.keypoints[9].score;
     }
 }
 
 function draw() {
+    //for left wrist song
     image(video, 0, 0, 600, 500)
 
-     
-    PlayOrNot = song1.isPlaying();
 
-    fill("Red");
-    stroke("Black");
+    PlayOrNot_Left = song1.isPlaying();
 
-    if(LeftWristX > 0.2)
-    {  
-    circle(LeftWristX, LeftWristY, 10000);
-    song2.stop();
+    if (ScoreLeftWrist > 0.2) {
 
-    if(PlayOrNot = false)
-    {
-        song1.play();
-        document.getElementById("snnm").innerHTML = "Song Name = " + song1;
+        fill("Red");
+        stroke("Black");
+        circle(LeftWristX, LeftWristY, 50);
+
+        song2.stop();
+
+        if (PlayOrNot_Left == false) {
+            song1.play();
+            document.getElementById("snnm").innerHTML = "Song Name = Beat It ";
+        }
     }
+
+    //-----------------------------------------------------------------------------
+
+    //for right wrist song
+    PlayOrNot_Right = song2.isPlaying();
+
+    if (ScoreRightWrist > 0.2) {
+        fill("blue");
+        stroke("green");
+        circle(RightWristX, RightWristY, 50);
+
+        song1.stop();
+
+        if (PlayOrNot_Right) {
+            song2.play();
+            document.getElementById("snnm").innerHTML = "Song Name = Ya Li li";
+        }
     }
 }
